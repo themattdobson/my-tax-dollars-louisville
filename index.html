@@ -705,11 +705,15 @@ function buildPills() {
   container.innerHTML = '';
   const metroTotal = taxes.metro_occ + taxes.metro_prop;
   const jcpsTotal  = taxes.jcps_occ  + taxes.jcps_prop;
+  const occTotal   = taxes.metro_occ + taxes.jcps_occ;
+  const propTotal  = taxes.metro_prop + taxes.jcps_prop;
   const allTotal   = metroTotal + jcpsTotal;
 
-  if (allTotal   > 0) container.appendChild(makePill('all',   'All taxes', allTotal));
-  if (metroTotal > 0) container.appendChild(makePill('metro', 'Metro',     metroTotal));
-  if (jcpsTotal  > 0) container.appendChild(makePill('jcps',  'JCPS',      jcpsTotal));
+  if (allTotal  > 0) container.appendChild(makePill('all',  'All taxes',        allTotal));
+  if (metroTotal > 0) container.appendChild(makePill('metro', 'Louisville Metro', metroTotal));
+  if (jcpsTotal  > 0) container.appendChild(makePill('jcps',  'JCPS',            jcpsTotal));
+  if (occTotal   > 0) container.appendChild(makePill('occ',  'Occupational tax', occTotal));
+  if (propTotal  > 0) container.appendChild(makePill('prop', 'Property tax',     propTotal));
 }
 
 function makePill(view, label, amount) {
@@ -729,16 +733,30 @@ function makePill(view, label, amount) {
 function refreshReceipt() {
   const metroTotal = taxes.metro_occ + taxes.metro_prop;
   const jcpsTotal  = taxes.jcps_occ  + taxes.jcps_prop;
+  const occTotal   = taxes.metro_occ + taxes.jcps_occ;
+  const propTotal  = taxes.metro_prop + taxes.jcps_prop;
   const allTotal   = metroTotal + jcpsTotal;
 
   const viewAmount  = activeView === 'metro' ? metroTotal
                     : activeView === 'jcps'  ? jcpsTotal
+                    : activeView === 'occ'   ? occTotal
+                    : activeView === 'prop'  ? propTotal
                     : allTotal;
-  const metroAmount = activeView === 'jcps'  ? 0 : metroTotal;
-  const jcpsAmount  = activeView === 'metro' ? 0 : jcpsTotal;
+
+  const metroAmount = activeView === 'jcps'  ? 0
+                    : activeView === 'occ'   ? taxes.metro_occ
+                    : activeView === 'prop'  ? taxes.metro_prop
+                    : metroTotal;
+
+  const jcpsAmount  = activeView === 'metro' ? 0
+                    : activeView === 'occ'   ? taxes.jcps_occ
+                    : activeView === 'prop'  ? taxes.jcps_prop
+                    : jcpsTotal;
 
   const viewLabel = activeView === 'metro' ? 'Louisville Metro tax'
                   : activeView === 'jcps'  ? 'JCPS tax'
+                  : activeView === 'occ'   ? 'Occupational tax'
+                  : activeView === 'prop'  ? 'Property tax'
                   : 'Total local tax';
 
   document.getElementById('total-display').textContent   = fmtFull(viewAmount);
