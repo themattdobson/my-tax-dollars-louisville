@@ -1,0 +1,467 @@
+{
+  "fiscal_year": 2025,
+  "total_budget": 841835733,
+  "source_url": "https://data.louisvilleky.gov/api/download/v1/items/260d9a7e84dc4460b75915a264d3a2f6/csv?layers=0",
+  "generated_at": "2026-03-16T00:21:08.277189+00:00",
+  "agencies": [
+    {
+      "name": "Public Works & Assets",
+      "raw": "Public Works & Assets",
+      "total": 121257584,
+      "pct": 0.144,
+      "color": "#3d6b2f",
+      "desc": "Road maintenance, bridges, city facilities",
+      "vendors": [
+        {
+          "name": "HALL CONTRACTING OF KENTUCKY INC",
+          "amt": 33014391
+        },
+        {
+          "name": "LOUISVILLE PAVING COMPANY INC",
+          "amt": 12843563
+        },
+        {
+          "name": "PACE CONTRACTING LLC",
+          "amt": 9521552
+        },
+        {
+          "name": "LOUISVILLE GAS & ELECTRIC COMPANY",
+          "amt": 5505286
+        },
+        {
+          "name": "JOASH CONSTRUCTION INC",
+          "amt": 4853799
+        }
+      ]
+    },
+    {
+      "name": "Office of Housing & Community Dev.",
+      "raw": "Office of Housing & Community Development",
+      "total": 111433085,
+      "pct": 0.1324,
+      "color": "#8a5a00",
+      "desc": "Affordable housing grants, loans, community development",
+      "vendors": [
+        {
+          "name": "LOUISVILLE METRO AFFORDABLE HOUSING TRUST FUND",
+          "amt": 34058844
+        },
+        {
+          "name": "SHEEHAN LANDING LP",
+          "amt": 6831148
+        },
+        {
+          "name": "VOLUNTEERS OF AMERICA MID-STATES",
+          "amt": 6280686
+        },
+        {
+          "name": "MIRANDA CONSTRUCTION LLC",
+          "amt": 6012238
+        },
+        {
+          "name": "WAYSIDE CHRISTIAN MISSION",
+          "amt": 5872556
+        }
+      ]
+    },
+    {
+      "name": "Facilities & Fleet Management",
+      "raw": "Facilities and Fleet Management",
+      "total": 103977863,
+      "pct": 0.1235,
+      "color": "#4a6b2f",
+      "desc": "City buildings, vehicle fleet, fuel",
+      "vendors": [
+        {
+          "name": "WEX INC",
+          "amt": 7351011
+        },
+        {
+          "name": "GENUINE PARTS COMPANY",
+          "amt": 6935356
+        },
+        {
+          "name": "CALHOUN CONSTRUCTION SERVICES  INC.",
+          "amt": 6606293
+        },
+        {
+          "name": "SUPERIOR MAINTENANCE CO.",
+          "amt": 6280738
+        },
+        {
+          "name": "LOUISVILLE GAS & ELECTRIC COMPANY",
+          "amt": 4202162
+        }
+      ]
+    },
+    {
+      "name": "Louisville Metro Police Dept.",
+      "raw": "Louisville Metro Police Department",
+      "total": 87676510,
+      "pct": 0.1041,
+      "color": "#1a3a5c",
+      "desc": "Vendor contracts, equipment, technology \u2014 payroll is separate",
+      "vendors": [
+        {
+          "name": "DAVENPORT AVIATION",
+          "amt": 35325272
+        },
+        {
+          "name": "CALHOUN CONSTRUCTION SERVICES  INC.",
+          "amt": 10636864
+        },
+        {
+          "name": "AXON ENTERPRISE INC",
+          "amt": 6770127
+        },
+        {
+          "name": "DNA LABS INTERNATIONAL",
+          "amt": 2919156
+        },
+        {
+          "name": "NELSON & CO LLC",
+          "amt": 2810344
+        }
+      ]
+    },
+    {
+      "name": "Parks & Recreation",
+      "raw": "Parks & Recreation",
+      "total": 64188564,
+      "pct": 0.0762,
+      "color": "#1a5c3a",
+      "desc": "Metro parks, community centers, trails, programming",
+      "vendors": [
+        {
+          "name": "W PRINCIPLES LLC",
+          "amt": 8061750
+        },
+        {
+          "name": "CALHOUN CONSTRUCTION SERVICES  INC.",
+          "amt": 7948894
+        },
+        {
+          "name": "MAC CONSTRUCTION & EXCAVATING  INC",
+          "amt": 6838716
+        },
+        {
+          "name": "EZ CONSTRUCTION COMPANY INC",
+          "amt": 5561892
+        },
+        {
+          "name": "RIVERSIDE PAVING & CONTRACTING CO  INC",
+          "amt": 3825865
+        }
+      ]
+    },
+    {
+      "name": "Metro Technology Services",
+      "raw": "Metro Technology Services",
+      "total": 49243482,
+      "pct": 0.0585,
+      "color": "#2d4a5c",
+      "desc": "IT infrastructure, open data, cybersecurity",
+      "vendors": [
+        {
+          "name": "CDW LLC",
+          "amt": 25288242
+        },
+        {
+          "name": "DELL MARKETING LP",
+          "amt": 6661051
+        },
+        {
+          "name": "INSIGHT PUBLIC SECTOR",
+          "amt": 2475620
+        },
+        {
+          "name": "ACCELA INC",
+          "amt": 2060835
+        },
+        {
+          "name": "CARAHSOFT TECHNOLOGY CORPORATION",
+          "amt": 1545542
+        }
+      ]
+    },
+    {
+      "name": "Public Health & Wellness",
+      "raw": "Public Health & Wellness",
+      "total": 39970369,
+      "pct": 0.0475,
+      "color": "#7a2d6e",
+      "desc": "Restaurant inspections, health programs, EMS support",
+      "vendors": [
+        {
+          "name": "CHS TX INC",
+          "amt": 15212699
+        },
+        {
+          "name": "CROWN SERVICES INC",
+          "amt": 7155230
+        },
+        {
+          "name": "UNIVERSITY OF LOUISVILLE",
+          "amt": 3019958
+        },
+        {
+          "name": "GOODWILL INDUSTRIES OF KENTUCKY INC",
+          "amt": 1200000
+        },
+        {
+          "name": "MEDICALISTICS  LLC",
+          "amt": 1184652
+        }
+      ]
+    },
+    {
+      "name": "Economic Development",
+      "raw": "Economic Development",
+      "total": 33168487,
+      "pct": 0.0394,
+      "color": "#6b4a2d",
+      "desc": "Business attraction, incentives, Churchill Downs TIF",
+      "vendors": [
+        {
+          "name": "CHURCHILL DOWNS INCORPORATED",
+          "amt": 8804198
+        },
+        {
+          "name": "LOUISVILLE RENAISSANCE ZONE CORPORATION",
+          "amt": 2087198
+        },
+        {
+          "name": "LOUISVILLE ECONOMIC DEVELOPMENT ALLIANCE INC",
+          "amt": 1500000
+        },
+        {
+          "name": "SOCCER HOLDINGS LLC",
+          "amt": 1346366
+        },
+        {
+          "name": "THE GREATER LOUISVILLE WORKFORCE DEVELOPMENT BOARD INC",
+          "amt": 1230636
+        }
+      ]
+    },
+    {
+      "name": "OMB Finance & Administration",
+      "raw": "OMB Finance",
+      "total": 28453664,
+      "pct": 0.0338,
+      "color": "#4a4540",
+      "desc": "Budget management, payroll admin, city-wide IT",
+      "vendors": [
+        {
+          "name": "LOUISVILLE ARENA AUTHORITY INC",
+          "amt": 10800000
+        },
+        {
+          "name": "JOHNSON CONTROLS INC",
+          "amt": 2093472
+        },
+        {
+          "name": "WORKDAY INC",
+          "amt": 1973770
+        },
+        {
+          "name": "U OF L HEALTH LOUISVILLE INC",
+          "amt": 1830843
+        },
+        {
+          "name": "FAST LP",
+          "amt": 1700000
+        }
+      ]
+    },
+    {
+      "name": "Office of Resilience & Community Svcs",
+      "raw": "Office of Resilience and Community Services",
+      "total": 25832374,
+      "pct": 0.0307,
+      "color": "#6b3a2d",
+      "desc": "Social services, community programs, resilience initiatives",
+      "vendors": [
+        {
+          "name": "LOUISVILLE GAS & ELECTRIC COMPANY",
+          "amt": 5023081
+        },
+        {
+          "name": "HOUSE OF RUTH INC",
+          "amt": 4302615
+        },
+        {
+          "name": "VOLUNTEERS OF AMERICA MID-STATES",
+          "amt": 1412481
+        },
+        {
+          "name": "AHEAD HUMAN RESOURCES",
+          "amt": 928830
+        },
+        {
+          "name": "ST JOHN CENTER INC",
+          "amt": 583980
+        }
+      ]
+    },
+    {
+      "name": "Louisville Free Public Library",
+      "raw": "Louisville Free Public Library",
+      "total": 23299055,
+      "pct": 0.0277,
+      "color": "#3a2d6b",
+      "desc": "Branch libraries, collections, digital services",
+      "vendors": [
+        {
+          "name": "SULLIVAN & COZART INC",
+          "amt": 12028864
+        },
+        {
+          "name": "OVERDRIVE INC",
+          "amt": 1361772
+        },
+        {
+          "name": "BRODART CO",
+          "amt": 1194752
+        },
+        {
+          "name": "UNIVERSAL PROTECTION SERVICE LP",
+          "amt": 841465
+        },
+        {
+          "name": "FARBER SPECIALTY VEHICLES INC",
+          "amt": 692906
+        }
+      ]
+    },
+    {
+      "name": "KentuckianaWorks",
+      "raw": "KentuckianaWorks",
+      "total": 19647210,
+      "pct": 0.0233,
+      "color": "#2d5a9e",
+      "desc": "Workforce development, job training, employment services",
+      "vendors": [
+        {
+          "name": "KENTUCKIANAWORKS FOUNDATION INC",
+          "amt": 5525000
+        },
+        {
+          "name": "GOODWILL INDUSTRIES OF KENTUCKY INC",
+          "amt": 4191267
+        },
+        {
+          "name": "AHEAD HUMAN RESOURCES",
+          "amt": 2473516
+        },
+        {
+          "name": "ECKERD YOUTH ALTERNATIVES INC",
+          "amt": 1068639
+        },
+        {
+          "name": "CENTER FOR EMPLOYMENT OPPORTUNITIES INC",
+          "amt": 886865
+        }
+      ]
+    },
+    {
+      "name": "Louisville Metro Corrections",
+      "raw": "Department of Corrections",
+      "total": 18656296,
+      "pct": 0.0222,
+      "color": "#5c2d1a",
+      "desc": "Jail operations, inmate programs, food service",
+      "vendors": [
+        {
+          "name": "ARAMARK SERVICES INC",
+          "amt": 2141246
+        },
+        {
+          "name": "LUSK MECHANICALCONTRACTORS INC",
+          "amt": 2131975
+        },
+        {
+          "name": "TRINITY SERVICES GROUP INC DBA TRINITY",
+          "amt": 1385053
+        },
+        {
+          "name": "REASSURANCE SOLUTIONS",
+          "amt": 1197500
+        },
+        {
+          "name": "WALKER MECHANICAL CONTRACTORS INC",
+          "amt": 981756
+        }
+      ]
+    },
+    {
+      "name": "Louisville Zoo",
+      "raw": "Louisville Zoo",
+      "total": 18497837,
+      "pct": 0.022,
+      "color": "#2d6b3a",
+      "desc": "Zoo operations, animal care, capital projects",
+      "vendors": [
+        {
+          "name": "SCHMIDT ASSOCIATES",
+          "amt": 3304249
+        },
+        {
+          "name": "LOUISVILLE ZOO FOUNDATION",
+          "amt": 2708026
+        },
+        {
+          "name": "CLOVERPORT SERVICES LLC",
+          "amt": 1286723
+        },
+        {
+          "name": "LUSK MECHANICALCONTRACTORS INC",
+          "amt": 1211308
+        },
+        {
+          "name": "LOUISVILLE GAS & ELECTRIC COMPANY",
+          "amt": 853645
+        }
+      ]
+    },
+    {
+      "name": "Emergency Mgmt & MetroSafe",
+      "raw": "ES & MetroSafe",
+      "total": 14551674,
+      "pct": 0.0173,
+      "color": "#2d3a6b",
+      "desc": "Disaster preparedness, 911 coordination, dispatch",
+      "vendors": [
+        {
+          "name": "AT&T CORP",
+          "amt": 3565544
+        },
+        {
+          "name": "MOTOROLA SOLUTIONS INC",
+          "amt": 1944036
+        },
+        {
+          "name": "SEVEN COUNTIES SERVICES INC",
+          "amt": 1766488
+        },
+        {
+          "name": "STRYKER SALES CORP",
+          "amt": 1614470
+        },
+        {
+          "name": "AXXIS LEASING INC",
+          "amt": 1356984
+        }
+      ]
+    },
+    {
+      "name": "Other Departments",
+      "raw": "__other__",
+      "total": 81981680,
+      "pct": 0.0974,
+      "color": "#7a7264",
+      "desc": "37 smaller departments and programs",
+      "vendors": []
+    }
+  ]
+}

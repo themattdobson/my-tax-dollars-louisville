@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 
 DATASET_ID = "260d9a7e84dc4460b75915a264d3a2f6"
 FISCAL_YEAR = 2025
-TOP_AGENCIES = 12   # keep this many top agencies; rest collapse into "Other"
+TOP_AGENCIES = 15   # keep this many top agencies; rest collapse into "Other"
 TOP_VENDORS  = 5    # top vendors shown per agency drill-down
 
 # Try the Louisville Metro portal first; arcgis.com is the fallback
@@ -30,40 +30,61 @@ DOWNLOAD_URLS = [
     f"https://opendata.arcgis.com/datasets/{DATASET_ID}_0.csv",
 ]
 
+# ── Agency name normalization ──────────────────────────────────────────────────
+# Merges duplicate/variant spellings into a single canonical name.
+# Keys are lowercase; first match wins. Applied before aggregation.
+AGENCY_ALIASES: list[tuple[str, str]] = [
+    ("kentuckiana works",  "KentuckianaWorks"),  # two spellings in the data
+    ("kentuckiaworks",     "KentuckianaWorks"),
+]
+
+def normalize_agency(name: str) -> str:
+    lower = name.lower()
+    for fragment, canonical in AGENCY_ALIASES:
+        if fragment in lower:
+            return canonical
+    return name
+
+
 # ── Department metadata ────────────────────────────────────────────────────────
 # Maps lowercase name fragments → (display_name, color, description)
 # The script uses the raw agency name from the data, but tries to match these
 # for a friendlier display name, brand color, and subtitle.
 DEPT_META = {
-    "police":            ("Louisville Metro Police Dept.",   "#1a3a5c", "Patrol, investigations, training, equipment"),
-    "public works":      ("Public Works & Assets",           "#3d6b2f", "Road maintenance, bridges, city facilities"),
-    "health":            ("Public Health & Wellness",        "#7a2d6e", "Restaurant inspections, health programs, EMS"),
-    "develop louisville":("Develop Louisville",              "#8a5a00", "Affordable housing, zoning, development"),
-    "fire":              ("Louisville Fire Department",      "#b8360a", "Fire stations, apparatus, firefighter salaries"),
-    "parks":             ("Parks & Recreation",              "#1a5c3a", "Metro parks, community centers, trails"),
-    "kentuckiana":       ("KentuckianaWorks",                "#2d5a9e", "Job training, employment services"),
-    "budget":            ("OMB Finance & Administration",    "#4a4540", "Budget mgmt, payroll, city-wide IT"),
-    "omb":               ("OMB Finance & Administration",    "#4a4540", "Budget mgmt, payroll, city-wide IT"),
-    "finance":           ("OMB Finance & Administration",    "#4a4540", "Budget mgmt, payroll, city-wide IT"),
-    "council":           ("Metro Council & Other",           "#5c4a1a", "Council operations, community services, grants"),
-    "corrections":       ("Louisville Metro Corrections",    "#5c2d1a", "Jail operations, inmate programs"),
-    "animal":            ("Louisville Metro Animal Services","#2d5c4a", "Animal shelter, enforcement, adoptions"),
-    "economic":          ("Economic Development",            "#6b4a2d", "Business attraction, incentives"),
-    "human":             ("Human Relations Commission",      "#6b2d5c", "Civil rights, equity programs"),
-    "emergency":         ("Emergency Management",            "#2d3a6b", "Disaster preparedness, 911 coordination"),
-    "sustainability":    ("Office of Sustainability",        "#1a5c3a", "Climate action, energy efficiency"),
-    "technology":        ("Metro Technology Services",       "#2d4a5c", "IT infrastructure, open data, cybersecurity"),
+    "police":                  ("Louisville Metro Police Dept.",         "#1a3a5c", "Vendor contracts, equipment, technology — payroll is separate"),
+    "public works":            ("Public Works & Assets",                 "#3d6b2f", "Road maintenance, bridges, city facilities"),
+    "housing":                 ("Office of Housing & Community Dev.",    "#8a5a00", "Affordable housing grants, loans, community development"),
+    "facilities":              ("Facilities & Fleet Management",         "#4a6b2f", "City buildings, vehicle fleet, fuel"),
+    "health":                  ("Public Health & Wellness",              "#7a2d6e", "Restaurant inspections, health programs, EMS support"),
+    "develop louisville":      ("Develop Louisville",                    "#8a5a00", "Zoning, planning, development review"),
+    "fire":                    ("Louisville Fire Department",            "#b8360a", "Apparatus, equipment, supplies — payroll is separate"),
+    "parks":                   ("Parks & Recreation",                    "#1a5c3a", "Metro parks, community centers, trails, programming"),
+    "kentuckiana":             ("KentuckianaWorks",                      "#2d5a9e", "Workforce development, job training, employment services"),
+    "budget":                  ("OMB Finance & Administration",          "#4a4540", "Budget management, payroll admin, city-wide IT"),
+    "omb":                     ("OMB Finance & Administration",          "#4a4540", "Budget management, payroll admin, city-wide IT"),
+    "finance":                 ("OMB Finance & Administration",          "#4a4540", "Budget management, payroll admin, city-wide IT"),
+    "council":                 ("Metro Council",                         "#5c4a1a", "Council operations, community services, district grants"),
+    "corrections":             ("Louisville Metro Corrections",          "#5c2d1a", "Jail operations, inmate programs, food service"),
+    "animal":                  ("Metro Animal Services",                 "#2d5c4a", "Animal shelter, enforcement, adoptions"),
+    "economic":                ("Economic Development",                  "#6b4a2d", "Business attraction, incentives, Churchill Downs TIF"),
+    "human relations":         ("Human Relations Commission",            "#6b2d5c", "Civil rights, equity programs"),
+    "emergency":               ("Emergency Mgmt & MetroSafe",            "#2d3a6b", "Disaster preparedness, 911 coordination, dispatch"),
+    "metrosafe":               ("Emergency Mgmt & MetroSafe",            "#2d3a6b", "Disaster preparedness, 911 coordination, dispatch"),
+    "sustainability":          ("Office of Sustainability",              "#1a5c3a", "Climate action, energy efficiency"),
+    "technology":              ("Metro Technology Services",             "#2d4a5c", "IT infrastructure, open data, cybersecurity"),
+    "zoo":                     ("Louisville Zoo",                        "#2d6b3a", "Zoo operations, animal care, capital projects"),
+    "library":                 ("Louisville Free Public Library",        "#3a2d6b", "Branch libraries, collections, digital services"),
+    "resilience":              ("Office of Resilience & Community Svcs", "#6b3a2d", "Social services, community programs, resilience initiatives"),
+    "philanthropy":            ("Office of Philanthropy",                "#5c2d5c", "Grants management, nonprofit partnerships"),
+    "social services":         ("Office of Social Services",             "#6b2d3a", "Direct social services, case management"),
+    "safe":                    ("Office for Safe & Healthy Neighborhoods","#3a5c2d", "Violence prevention, neighborhood safety programs"),
+    "waterfront":              ("Waterfront Development Corp",           "#2d4a6b", "Waterfront park operations and capital improvements"),
 }
 
-# Fallback colors for agencies that don't match any keyword
-FALLBACK_COLORS = [
-    "#4a4a4a", "#6b5a3a", "#3a5c6b", "#5c3a6b",
-    "#6b3a3a", "#3a6b5c", "#5c6b3a",
-]
 
 
 def match_meta(agency_name: str) -> tuple[str, str, str]:
-    """Return (display_name, color, desc) for the given raw agency name."""
+    """Return (display_name, color, desc) for the given normalized agency name."""
     lower = agency_name.lower()
     for keyword, (display, color, desc) in DEPT_META.items():
         if keyword in lower:
@@ -124,7 +145,7 @@ agency_vendors: dict[str, dict[str, float]]   = defaultdict(lambda: defaultdict(
 skipped = 0
 
 for row in rows:
-    agency = get(row, "agency", "Agency", "department")
+    agency = normalize_agency(get(row, "agency", "Agency", "department"))
     if not agency:
         skipped += 1
         continue

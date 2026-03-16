@@ -606,10 +606,10 @@ async function loadBudget() {
       `taxes and see exactly where it went — department by department, vendor by vendor.`;
 
     document.getElementById('data-note').innerHTML =
-      `Based on FY${FISCAL_YEAR} expenditure data from ` +
+      `FY${FISCAL_YEAR} vendor expenditure data from ` +
       `<a href="https://data.louisvilleky.gov" target="_blank">data.louisvilleky.gov</a> · ` +
-      `${fmt(TOTAL_BUDGET)} total operating expenditures<br>` +
-      `Vendor examples are real payees from the public dataset · Click any row to see details`;
+      `${fmt(TOTAL_BUDGET)} in vendor payments (excludes payroll)<br>` +
+      `All payees are real entries from Louisville Metro's public expenditure dataset · Click any row to see details`;
 
     // Store for use in calculate()
     window._fyMeta = `Fiscal Year ${FISCAL_YEAR}<br>July 1, ${fyStart} – June 30, ${fyEnd}<br>Louisville Metro Government`;
@@ -712,7 +712,7 @@ function refreshReceipt() {
   document.getElementById('section-right').innerHTML =
     'Your share <span style="opacity:0.6;font-size:9px">' + viewIndicator + '</span>';
   document.getElementById('receipt-tagline').textContent =
-    `That's your share of a ${fmt(TOTAL_BUDGET)} budget serving 770,000 Louisville residents.`;
+    `That's your share of ${fmt(TOTAL_BUDGET)} in vendor expenditures — the publicly reported slice of Louisville Metro's budget.`;
 
   renderLineItems(viewAmount);
 }
