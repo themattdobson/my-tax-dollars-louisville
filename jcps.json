@@ -1,0 +1,22 @@
+{
+  "fiscal_year": 2025,
+  "total_budget": 1985207448,
+  "occ_rate": 0.0075,
+  "prop_rate": 0.00735,
+  "senior_exemption": 46350,
+  "source": "JCPS FY2025 Tentative Budget",
+  "source_url": "https://budget.jefferson.kyschools.us",
+  "categories": [
+    { "name": "Instruction",               "pct": 0.557, "color": "#1a3a5c", "desc": "Classroom teachers, materials, instructional technology" },
+    { "name": "Operations & Maintenance",  "pct": 0.092, "color": "#3d6b2f", "desc": "Building upkeep, utilities, custodial services" },
+    { "name": "School Administration",     "pct": 0.055, "color": "#7a2d6e", "desc": "Principals, assistant principals, school office staff" },
+    { "name": "Student Support Services",  "pct": 0.051, "color": "#8a5a00", "desc": "Counselors, psychologists, social workers" },
+    { "name": "Transportation",            "pct": 0.050, "color": "#b8360a", "desc": "School buses, routes, drivers" },
+    { "name": "Debt Service",              "pct": 0.058, "color": "#4a4540", "desc": "Bond payments for school construction" },
+    { "name": "Food Services",             "pct": 0.041, "color": "#1a5c3a", "desc": "School meals, cafeteria staff" },
+    { "name": "Instructional Staff Support","pct": 0.038, "color": "#2d5a9e", "desc": "Curriculum, professional development, libraries" },
+    { "name": "Business & Central Services","pct": 0.028, "color": "#5c4a1a", "desc": "Finance, HR, IT, purchasing" },
+    { "name": "District Administration",   "pct": 0.020, "color": "#5c2d1a", "desc": "Superintendent, board operations, legal" },
+    { "name": "Other Programs",            "pct": 0.010, "color": "#7a7264", "desc": "Community services, adult ed, miscellaneous" }
+  ]
+}

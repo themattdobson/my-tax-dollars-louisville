@@ -483,12 +483,12 @@ body {
 <div class="container">
 
   <div class="intro">
-    <h1>Your money.<br><em>Your receipt.</em></h1>
+    <h1>How your tax dollars work.</h1>
     <p id="intro-text">Louisville Metro spends over a billion dollars each year. Enter what you paid in taxes and see exactly where it went — department by department, vendor by vendor.</p>
   </div>
 
   <div class="load-error hidden" id="load-error">
-    Could not load budget.json. Run <code>python3 aggregate.py</code> first, then serve this page with
+    Could not load budget data. Make sure <code>budget.json</code> and <code>jcps.json</code> exist, then serve with
     <code>python3 -m http.server</code> (fetch requires HTTP, not file://).
   </div>
 
@@ -501,7 +501,7 @@ body {
           <span class="input-prefix">$</span>
           <input class="dollar-input" type="text" id="income-input" placeholder="65,000" inputmode="numeric" style="font-size:26px">
         </div>
-        <p class="input-hint" style="margin-top:6px">2.2% occupational tax for residents</p>
+        <p class="input-hint" style="margin-top:6px">2.2% Metro occ. tax + 0.75% JCPS occ. tax</p>
       </div>
 
       <div class="field-block">
@@ -510,8 +510,8 @@ body {
           <span class="input-prefix">$</span>
           <input class="dollar-input" type="text" id="property-input" placeholder="225,000" inputmode="numeric" style="font-size:26px">
         </div>
-        <p class="input-hint" style="margin-top:6px">$0.1259 per $100 assessed value</p>
-        <span class="senior-badge hidden" id="exemption-badge">✓ $36,900 senior exemption applied</span>
+        <p class="input-hint" style="margin-top:6px">$0.1259/$100 Metro · $0.7350/$100 JCPS</p>
+        <span class="senior-badge hidden" id="exemption-badge">✓ Senior exemptions: Metro $36,900 · JCPS $46,350</span>
       </div>
 
       <div class="field-block">
@@ -544,13 +544,26 @@ body {
     </div>
 
     <div class="receipt-body">
+      <div class="receipt-section-head" id="metro-entity-head" style="background:var(--ink);color:var(--paper)">
+        <span>Louisville Metro Government</span>
+        <span id="metro-entity-total"></span>
+      </div>
       <div class="receipt-section-head">
         <span>Department</span>
         <span id="section-right">Your share · % of budget</span>
       </div>
       <div id="line-items"></div>
+      <div class="receipt-section-head" id="jcps-entity-head" style="background:#1a3a5c;color:var(--paper)">
+        <span>Jefferson County Public Schools</span>
+        <span id="jcps-entity-total"></span>
+      </div>
+      <div class="receipt-section-head">
+        <span>Category</span>
+        <span>Your share · % of budget</span>
+      </div>
+      <div id="jcps-items"></div>
       <div class="receipt-total">
-        <span class="total-label" id="total-label">Total Louisville Metro tax</span>
+        <span class="total-label" id="total-label">Total local tax</span>
         <span class="total-amount" id="total-display-2">$0</span>
       </div>
     </div>
@@ -568,51 +581,61 @@ let TOTAL_BUDGET = 0;
 let FISCAL_YEAR  = '';
 let dataLoaded   = false;
 
-// ── Fixed tax constants ───────────────────────────────────────────────────────
+// ── JCPS state (loaded from jcps.json) ───────────────────────────────────────
+let JCPS_CATEGORIES   = [];
+let JCPS_TOTAL_BUDGET = 0;
+let JCPS_OCC_RATE     = 0.0075;
+let JCPS_PROP_RATE    = 0.00735;
+let JCPS_SENIOR_EX    = 46350;
+
+// ── Fixed Metro tax constants ─────────────────────────────────────────────────
 const SENIOR_EXEMPTION = 36900;
 const PROPERTY_RATE    = 0.001259;
 const OCC_TAX_RATE     = 0.022;
 
 // ── View state ────────────────────────────────────────────────────────────────
-let taxes      = { occ: 0, prop: 0 };
-let activeView = 'combined'; // 'combined' | 'occ' | 'prop'
+let taxes      = { metro_occ: 0, metro_prop: 0, jcps_occ: 0, jcps_prop: 0 };
+let activeView = 'all'; // 'all' | 'metro' | 'jcps'
 
 // ── Formatters ────────────────────────────────────────────────────────────────
 function parseDollars(str) { return parseFloat((str || '').replace(/[,$\s]/g, '')) || 0; }
 function fmt(n)     { return n < 1 ? '$0' : '$' + Math.round(n).toLocaleString('en-US'); }
 function fmtFull(n) { return '$' + (n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
-// ── Load budget.json ──────────────────────────────────────────────────────────
+// ── Load budget.json + jcps.json ──────────────────────────────────────────────
 async function loadBudget() {
   try {
-    const resp = await fetch('budget.json');
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const data = await resp.json();
+    const [metroData, jcpsData] = await Promise.all([
+      fetch('budget.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+      fetch('jcps.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+    ]);
 
-    AGENCIES     = data.agencies;
-    TOTAL_BUDGET = data.total_budget;
-    FISCAL_YEAR  = data.fiscal_year;
+    AGENCIES          = metroData.agencies;
+    TOTAL_BUDGET      = metroData.total_budget;
+    FISCAL_YEAR       = metroData.fiscal_year;
+    JCPS_CATEGORIES   = jcpsData.categories;
+    JCPS_TOTAL_BUDGET = jcpsData.total_budget;
+    JCPS_OCC_RATE     = jcpsData.occ_rate;
+    JCPS_PROP_RATE    = jcpsData.prop_rate;
+    JCPS_SENIOR_EX    = jcpsData.senior_exemption;
 
-    // FY spans July–June
     const fyStart = FISCAL_YEAR - 1;
     const fyEnd   = FISCAL_YEAR;
 
-    // Update dynamic text
     document.getElementById('masthead-sub').textContent =
       `FY ${FISCAL_YEAR} · Louisville Metro Gov't`;
 
     document.getElementById('intro-text').textContent =
-      `Louisville Metro spent ${fmt(TOTAL_BUDGET)} in FY${FISCAL_YEAR}. Enter what you paid in ` +
-      `taxes and see exactly where it went — department by department, vendor by vendor.`;
+      `Louisville Metro and JCPS together spend over ${fmt(TOTAL_BUDGET + JCPS_TOTAL_BUDGET)} per year. ` +
+      `Enter what you paid in taxes and see exactly where it went — department by department.`;
 
     document.getElementById('data-note').innerHTML =
-      `FY${FISCAL_YEAR} vendor expenditure data from ` +
-      `<a href="https://data.louisvilleky.gov" target="_blank">data.louisvilleky.gov</a> · ` +
+      `Metro FY${FISCAL_YEAR} vendor data: <a href="https://data.louisvilleky.gov" target="_blank">data.louisvilleky.gov</a> · ` +
       `${fmt(TOTAL_BUDGET)} in vendor payments (excludes payroll)<br>` +
-      `All payees are real entries from Louisville Metro's public expenditure dataset · Click any row to see details`;
+      `JCPS FY${FISCAL_YEAR} budget: <a href="https://budget.jefferson.kyschools.us" target="_blank">budget.jefferson.kyschools.us</a> · ` +
+      `Tentative Budget · Category totals only, no vendor detail available`;
 
-    // Store for use in calculate()
-    window._fyMeta = `Fiscal Year ${FISCAL_YEAR}<br>July 1, ${fyStart} – June 30, ${fyEnd}<br>Louisville Metro Government`;
+    window._fyMeta = `Fiscal Year ${FISCAL_YEAR}<br>July 1, ${fyStart} – June 30, ${fyEnd}`;
 
     dataLoaded = true;
     const btn = document.getElementById('calc-btn');
@@ -620,7 +643,7 @@ async function loadBudget() {
     btn.textContent = 'Calculate my receipt →';
 
   } catch (err) {
-    console.error('Failed to load budget.json:', err);
+    console.error('Failed to load data:', err);
     document.getElementById('masthead-sub').textContent = 'Data unavailable';
     document.getElementById('load-error').classList.remove('hidden');
   }
@@ -641,22 +664,28 @@ function calculate() {
 
   if (!income && !propVal) { document.getElementById('income-input').focus(); return; }
 
-  taxes.occ  = income > 0 ? income * OCC_TAX_RATE : 0;
-  const effectiveValue = (age >= 65 && propVal > 0) ? Math.max(0, propVal - SENIOR_EXEMPTION) : propVal;
-  taxes.prop = propVal > 0 ? effectiveValue * PROPERTY_RATE : 0;
+  taxes.metro_occ  = income  > 0 ? income * OCC_TAX_RATE : 0;
+  const metroEff   = age >= 65 && propVal > 0 ? Math.max(0, propVal - SENIOR_EXEMPTION) : propVal;
+  taxes.metro_prop = propVal > 0 ? metroEff * PROPERTY_RATE : 0;
 
-  if (taxes.occ > 0 && taxes.prop === 0)      activeView = 'occ';
-  else if (taxes.prop > 0 && taxes.occ === 0) activeView = 'prop';
-  else                                         activeView = 'combined';
+  taxes.jcps_occ  = income  > 0 ? income * JCPS_OCC_RATE : 0;
+  const jcpsEff   = age >= 65 && propVal > 0 ? Math.max(0, propVal - JCPS_SENIOR_EX) : propVal;
+  taxes.jcps_prop = propVal > 0 ? jcpsEff * JCPS_PROP_RATE : 0;
 
-  // Receipt meta column
+  activeView = 'all';
+
+  const metroTotal = taxes.metro_occ + taxes.metro_prop;
+  const jcpsTotal  = taxes.jcps_occ  + taxes.jcps_prop;
+
   const metaLines = (window._fyMeta || '').split('<br>');
-  if (income > 0) metaLines.push(fmt(income) + ' income');
+  if (income > 0)  metaLines.push(fmt(income) + ' gross income');
   if (propVal > 0) {
-    const note = age >= 65 ? ` (−${fmt(SENIOR_EXEMPTION)} exemption)` : '';
+    const note = age >= 65 ? ' (exemptions applied)' : '';
     metaLines.push(fmt(propVal) + ' assessed value' + note);
   }
   if (age > 0) metaLines.push('Age ' + age);
+  if (metroTotal > 0) metaLines.push('Metro: ' + fmtFull(metroTotal));
+  if (jcpsTotal  > 0) metaLines.push('JCPS: '  + fmtFull(jcpsTotal));
   document.getElementById('receipt-meta').innerHTML = metaLines.join('<br>');
 
   buildPills();
@@ -669,12 +698,15 @@ function calculate() {
 
 // ── Source pills ──────────────────────────────────────────────────────────────
 function buildPills() {
-  const container = document.getElementById('source-pills');
+  const container  = document.getElementById('source-pills');
   container.innerHTML = '';
-  const hasBoth = taxes.occ > 0 && taxes.prop > 0;
-  if (hasBoth)        container.appendChild(makePill('combined', 'Combined', taxes.occ + taxes.prop));
-  if (taxes.occ > 0)  container.appendChild(makePill('occ',      'Occupational tax', taxes.occ));
-  if (taxes.prop > 0) container.appendChild(makePill('prop',     'Property tax',     taxes.prop));
+  const metroTotal = taxes.metro_occ + taxes.metro_prop;
+  const jcpsTotal  = taxes.jcps_occ  + taxes.jcps_prop;
+  const allTotal   = metroTotal + jcpsTotal;
+
+  if (allTotal   > 0) container.appendChild(makePill('all',   'All taxes', allTotal));
+  if (metroTotal > 0) container.appendChild(makePill('metro', 'Metro',     metroTotal));
+  if (jcpsTotal  > 0) container.appendChild(makePill('jcps',  'JCPS',      jcpsTotal));
 }
 
 function makePill(view, label, amount) {
@@ -692,32 +724,36 @@ function makePill(view, label, amount) {
 
 // ── Refresh receipt display ───────────────────────────────────────────────────
 function refreshReceipt() {
-  const viewAmount = activeView === 'occ'  ? taxes.occ
-                   : activeView === 'prop' ? taxes.prop
-                   : taxes.occ + taxes.prop;
+  const metroTotal = taxes.metro_occ + taxes.metro_prop;
+  const jcpsTotal  = taxes.jcps_occ  + taxes.jcps_prop;
+  const allTotal   = metroTotal + jcpsTotal;
 
-  const viewLabel = activeView === 'occ'  ? 'Occupational tax'
-                  : activeView === 'prop' ? 'Property tax'
-                  : 'Total Louisville Metro tax';
+  const viewAmount  = activeView === 'metro' ? metroTotal
+                    : activeView === 'jcps'  ? jcpsTotal
+                    : allTotal;
+  const metroAmount = activeView === 'jcps'  ? 0 : metroTotal;
+  const jcpsAmount  = activeView === 'metro' ? 0 : jcpsTotal;
 
-  const viewIndicator = activeView === 'combined' ? '% of budget'
-                      : activeView === 'occ'       ? '· occupational tax only'
-                      : '· property tax only';
+  const viewLabel = activeView === 'metro' ? 'Louisville Metro tax'
+                  : activeView === 'jcps'  ? 'JCPS tax'
+                  : 'Total local tax';
 
   document.getElementById('total-display').textContent   = fmtFull(viewAmount);
   document.getElementById('total-display-2').textContent = fmtFull(viewAmount);
   document.getElementById('receipt-label').textContent   =
-    activeView === 'combined' ? 'Your total contribution' : 'Viewing: ' + viewLabel.toLowerCase();
+    activeView === 'all' ? 'Your total contribution' : 'Viewing: ' + viewLabel.toLowerCase();
   document.getElementById('total-label').textContent = viewLabel;
-  document.getElementById('section-right').innerHTML =
-    'Your share <span style="opacity:0.6;font-size:9px">' + viewIndicator + '</span>';
   document.getElementById('receipt-tagline').textContent =
-    `That's your share of ${fmt(TOTAL_BUDGET)} in vendor expenditures — the publicly reported slice of Louisville Metro's budget.`;
+    `That's your share of ${fmt(TOTAL_BUDGET)} in Metro vendor spend + a ${fmt(JCPS_TOTAL_BUDGET)} JCPS budget.`;
 
-  renderLineItems(viewAmount);
+  document.getElementById('metro-entity-total').textContent = fmtFull(metroAmount);
+  document.getElementById('jcps-entity-total').textContent  = fmtFull(jcpsAmount);
+
+  renderLineItems(metroAmount);
+  renderJcpsItems(jcpsAmount);
 }
 
-// ── Line items ────────────────────────────────────────────────────────────────
+// ── Metro line items ──────────────────────────────────────────────────────────
 function renderLineItems(taxPaid) {
   const container = document.getElementById('line-items');
   container.innerHTML = '';
@@ -771,6 +807,44 @@ function renderLineItems(taxPaid) {
     container.appendChild(row);
     container.appendChild(drill);
   });
+}
+
+// ── JCPS category items ───────────────────────────────────────────────────────
+function renderJcpsItems(jcpsTaxPaid) {
+  const container = document.getElementById('jcps-items');
+  container.innerHTML = '';
+
+  JCPS_CATEGORIES.forEach((cat) => {
+    const share      = jcpsTaxPaid * cat.pct;
+    const pctDisplay = (cat.pct * 100).toFixed(1);
+
+    const row = document.createElement('div');
+    row.className = 'line-item';
+    row.style.cursor = 'default';
+    row.innerHTML = `
+      <div class="line-bar-wrap">
+        <div class="line-bar" style="background:${cat.color}22;border-left:4px solid ${cat.color}"></div>
+      </div>
+      <div class="line-content">
+        <div class="line-left">
+          <div class="line-name">${cat.name}</div>
+          ${cat.desc ? `<div class="line-sub">${cat.desc}</div>` : ''}
+        </div>
+        <div class="line-right">
+          <div class="line-amount">${fmtFull(share)}</div>
+          <div class="line-pct">${pctDisplay}% of budget</div>
+        </div>
+      </div>`;
+
+    container.appendChild(row);
+  });
+
+  if (JCPS_CATEGORIES.length > 0) {
+    const note = document.createElement('div');
+    note.style.cssText = 'padding:10px 32px;background:var(--cream);border-top:1px solid var(--rule)';
+    note.innerHTML = `<div class="drill-more">No vendor detail available for JCPS — see <a href="https://budget.jefferson.kyschools.us" target="_blank" style="color:var(--muted)">budget.jefferson.kyschools.us</a></div>`;
+    container.appendChild(note);
+  }
 }
 
 // ── Comma-format inputs ───────────────────────────────────────────────────────
